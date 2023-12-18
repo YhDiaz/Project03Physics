@@ -16,6 +16,10 @@ public class PlayerShoot : MonoBehaviour
     public float ballVolume;
     private float ballDistance = 2f;
 
+    public TextMeshProUGUI forceText;
+    public TextMeshProUGUI kConstantText;
+    public static float kConstant = 1;
+
     private void Start()
     {
         ballMass = 1f;
@@ -40,7 +44,21 @@ public class PlayerShoot : MonoBehaviour
         if (Input.GetKey(KeyCode.D) && ballVolume < 5) ballVolume += 0.1f;
         if (Input.GetKey(KeyCode.A) && ballVolume > 1) ballVolume -= 0.1f;
 
-        if (Input.GetKeyDown(KeyCode.Space) && instancedBall == null)
+        //K constant
+        if (Input.GetKey(KeyCode.K) && kConstant < 100f) kConstant += 0.1f;
+        if (Input.GetKey(KeyCode.J) && kConstant > 1f) kConstant -= 0.1f;
+
+        forceText.text = "Fuerza: " + force;
+        kConstantText.text = "Constante k: " + kConstant;
+
+        foreach (var spring in GameObject.FindObjectsByType<SpringJoint>(FindObjectsSortMode.None))
+        {
+            spring.spring = kConstant;
+        }
+
+        bool shoot = Input.GetKeyDown(KeyCode.Space) || Input.GetMouseButtonDown(0);
+
+        if (shoot && instancedBall == null)
         {
             GameObject ball = Instantiate(ballPrefab);
             instancedBall = ball;
@@ -60,7 +78,7 @@ public class PlayerShoot : MonoBehaviour
 
         for (int i = 1; i < N; i++)
         {
-            futurePositions[i] = futurePositions[i - 1] + (futureVelocity[i - 1] + futureVelocity[i]) / 2 * (1f / framesPerSecond);
+            futurePositions[i] = futurePositions[i - 1] + (futureVelocity[i - 1] /*+ futureVelocity[i]*/) * (1f / framesPerSecond);
             Vector3 acceleration = Physics.gravity;
             futureVelocity[i] = futureVelocity[i - 1] + acceleration * (1f / framesPerSecond);
         }
