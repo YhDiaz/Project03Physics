@@ -14,6 +14,7 @@ public class PlayerShoot : MonoBehaviour
     public float force;
     public float ballMass;
     public float ballVolume;
+    private float ballDistance = 2f;
 
     private void Start()
     {
@@ -24,59 +25,31 @@ public class PlayerShoot : MonoBehaviour
 
     void Update()
     {
-        if (instancedBall)
-        {
-            velText.text = "Velocidad: " + instancedBall.GetComponent<Rigidbody>().velocity;
-        }
+        //Velocity text
+        if (instancedBall) velText.text = "Velocidad: " + instancedBall.GetComponent<Rigidbody>().velocity;
 
-        if (Input.GetKey(KeyCode.UpArrow) && force < 5000)
-        {
-            force += 100;
-        }
+        //Force
+        if (Input.GetKey(KeyCode.UpArrow) && force < 5000) force += 100;
+        if (Input.GetKey(KeyCode.DownArrow) && force > 500) force -= 100;
 
-        if (Input.GetKey(KeyCode.DownArrow) && force > 500)
-        {
-            force -= 100;
-        }
+        //Ball mass
+        if (Input.GetKey(KeyCode.W) && ballMass < 10) ballMass += 0.1f;
+        if (Input.GetKey(KeyCode.S) && ballMass > 1) ballMass -= 0.1f;
 
-        if (Input.GetKey(KeyCode.W) && ballMass < 10)
-        {
-            ballMass += 0.1f;
-        }
+        //Ball volume
+        if (Input.GetKey(KeyCode.D) && ballVolume < 5) ballVolume += 0.1f;
+        if (Input.GetKey(KeyCode.A) && ballVolume > 1) ballVolume -= 0.1f;
 
-        if (Input.GetKey(KeyCode.S) && ballMass > 1)
-        {
-            ballMass -= 0.1f;
-        }
-
-        if (Input.GetKey(KeyCode.D) && ballVolume < 5)
-        {
-            ballVolume += 0.1f;
-        }
-
-        if (Input.GetKey(KeyCode.A) && ballVolume > 1)
-        {
-            ballVolume -= 0.1f;
-        }
-
-        if (Input.GetMouseButtonDown(0) && instancedBall == null)
+        if (Input.GetKeyDown(KeyCode.Space) && instancedBall == null)
         {
             GameObject ball = Instantiate(ballPrefab);
             instancedBall = ball;
-            ball.transform.position = transform.position;
+            ball.transform.position = transform.position + transform.forward * ballDistance;
             ball.transform.localScale = new Vector3(ballVolume, ballVolume, ballVolume);
-            //ball.GetComponent<Rigidbody>().velocity = transform.forward.normalized * force;
 
             Rigidbody ballURB = ball.GetComponent<Rigidbody>();
 
             ballURB.mass = ballMass;
-
-            //SphereCollider ballCollider = ballURB as SphereCollider;
-            //if (ballCollider != null)
-            {
-                //ballCollider.radius = ballVolume / 2f;
-            }
-
             ballURB.AddForce(transform.forward * force);
         }
 
